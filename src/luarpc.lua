@@ -5,7 +5,7 @@
 local socket = require("socket")
 local validator = require("validator")
 local marshall = require("marshalling")
-print("LuaSocket version: " .. socket._VERSION)
+--print("LuaSocket version: " .. socket._VERSION)
 
 local luarpc = {}
 -------------------------------------------------------------------------------- Main Data Structures
@@ -49,7 +49,7 @@ function luarpc.createProxy(host, port, interface_path, verbose)
       end
 
       local msg = marshall.create_protocol_msg(fname, params)
-      
+
       -- abre nova conexao e envia request
       if coroutine.isyieldable() then -- coroutine-client
         proxy_stub.conn = luarpc.create_client_stub_conn(host, port, true)
@@ -61,9 +61,9 @@ function luarpc.createProxy(host, port, interface_path, verbose)
 
         coroutines_by_socket[proxy_stub.conn] = curr_co -- registra na tabela
         table.insert(sockets_lst, proxy_stub.conn) -- insere no array do select
-        
-       
-        
+
+
+
         -- print("\n\n\t\t >>>>>> [CLT -> SVR] MSG TO BE SENT 1:",msg) -- [DEBUG]
         proxy_stub.conn:send(msg) -- envia pedido RPC
         local r1, r2 = coroutine.yield() -- CREATE PROXY
@@ -177,7 +177,7 @@ function luarpc.waitIncoming(verbose)
     elseif err == "timeout" then
       coList = coroutines_by_wakeup[wakeup_times[1]]
       table.remove(wakeup_times, 1)
-      if coList ~= nil then 
+      if coList ~= nil then
         while #coList > 0 do
           co = coList[1]
           table.remove(coList, 1)
@@ -191,10 +191,10 @@ function luarpc.waitIncoming(verbose)
             end
           end
         end
-      else 
+      else
         print(">>> '[TIMEOUT] No coroutine to resume.")
       end
-    end 
+    end
   end -- end while
 end
 
@@ -205,7 +205,7 @@ function luarpc.wait(timeToWait, verbose)
   end
   wakeup = os.time() + timeToWait
   table.insert(wakeup_times, wakeup)
-  
+
   if coroutines_by_wakeup[wakeup] == nil then
     coroutines_by_wakeup[wakeup] = {}
   end
@@ -234,7 +234,8 @@ function luarpc.process_request(client, request_msg, servant)
   end
 
   -- invoke the method passed in the request with all its parameters and get the result
-  local result = table.pack(servants_lst[servant]["obj"][func_name](table.unpack(params)))
+  local implFunc = servants_lst[servant]["obj"][func_name]
+  local result = table.pack(pcall(implFunc, table.unpack(params)))
   local msg_to_send = marshall.marshalling(result)
   -- print("\n\n\t\t >>>>>> [SVR -> CLT] MSG TO BE SENT FROM SERVER:",msg_to_send) -- [DEBUG]
   return msg_to_send
@@ -299,4 +300,4 @@ function luarpc.print_tables(obj)
 end
 
 -------------------------------------------------------------------------------- Return RPC
-return luarpc 
+return luarpc
