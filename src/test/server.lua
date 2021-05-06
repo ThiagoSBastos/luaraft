@@ -1,5 +1,7 @@
-package.path = "../?.lua;" .. package.path
+package.path = "../rpc/?.lua;" .. package.path
 local luarpc = require("luarpc")
+
+package.path = "../raft/?.lua;" .. package.path
 local luaraft = require("luaraft")
 
 local IP = "127.0.0.1"

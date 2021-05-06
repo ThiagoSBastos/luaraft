@@ -8,7 +8,7 @@ local marshall = require("marshalling")
 --print("LuaSocket version: " .. socket._VERSION)
 
 local luarpc = {}
--------------------------------------------------------------------------------- Main Data Structures
+------------------------------------------------------------------------ Main Data Structures
 local servants_lst = {} -- Table/Dict with -> servers_sockets.obj and servers_sockets.interface
 local sockets_lst = {} -- Array with all sockets
 local coroutines_by_socket = {} -- < socket:coroutine >
@@ -16,7 +16,7 @@ local coroutines_by_wakeup = {}
 local wakeup_times = {}
 -- local clients_lst = {} -- Not being used any more
 
--------------------------------------------------------------------------------- Auxiliary Functions
+------------------------------------------------------------------------- Auxiliary Functions
 local function add_new_client(client, servant)
   client:setoption("keepalive", true)
   -- clients_lst[client] = {}
@@ -25,7 +25,7 @@ local function add_new_client(client, servant)
   table.insert(sockets_lst, client) -- insert at sockets_lst
 end
 
--------------------------------------------------------------------------------- Main Functions
+------------------------------------------------------------------------------ Main Functions
 function luarpc.createServant(obj, interface_path, port)
   local server = socket.try(socket.bind("*", port))
   print("Server is running on port: " .. port)
@@ -220,7 +220,7 @@ function luarpc.wait(timeToWait, verbose)
   end
 end
 
--------------------------------------------------------------------------------- MARSHALLING/UNMARSHALLING
+------------------------------------------------------------------- MARSHALLING/UNMARSHALLING
 function luarpc.process_request(client, request_msg, servant)
   local func_name = table.remove(request_msg, 1) -- pop index 1
   local params = marshall.unmarshalling(request_msg, servants_lst[servant]["interface"])
@@ -241,7 +241,7 @@ function luarpc.process_request(client, request_msg, servant)
   return msg_to_send
 end
 
--------------------------------------------------------------------------------- Auxiliary Functions
+------------------------------------------------------------------------- Auxiliary Functions
 function luarpc.create_client_stub_conn(host, port, timeout)
   local conn = socket.connect(host, port)
   conn:setoption("tcp-nodelay", true)
