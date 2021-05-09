@@ -1,7 +1,7 @@
 struct = {
   name = "messageStruct",
   fields = {
-    {name = "timeout", type = "int"},
+    {name = "term", type = "int"},
     {name = "fromNode", type = "int"},
     {name = "toNode", type = "int"},
     {name = "type", type = "string"},
@@ -21,6 +21,8 @@ interface = {
     InitializeNode = {
       resulttype = "void",
       args = {
+        {direction = "in", type = "int"},
+        {direction = "in", type = "string"}
       }
     },
     StopNode ={

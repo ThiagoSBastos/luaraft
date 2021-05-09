@@ -69,17 +69,17 @@ function VALIDATOR.validate_client(params,fname,iface_args)
           reason = string.format("#%i arg of method '%s' must be a table and not %s",i,fname,type(params[i]))
         else
           for k,_ in pairs(params[i]) do
-            if k ~= "timeout" and k ~= "fromNode" and k ~= "toNode" and k ~= "type" and k~="value" then
+            if k ~= "term" and k ~= "fromNode" and k ~= "toNode" and k ~= "type" and k~="value" then
               reason = reason .. string.format("\n\t  #%i arg of method '%s' contains invalid keys! minhaStruct table does not support '%s' key",i,fname,k)
             end
           end
 
-          if tonumber(params[i].timeout) == nil then
-            reason = reason .. string.format("\n\t  #%i arg of method '%s' must be a table with 'timeout' of type int. Can't convert '%s' to number",i,fname,params[i].timeout)
+          if tonumber(params[i].term) == nil then
+            reason = reason .. string.format("\n\t  #%i arg of method '%s' must be a table with 'term' of type int. Can't convert '%s' to number",i,fname,params[i].term)
           else
-            params[i].timeout = tonumber(params[i].timeout)
-            if math.type(params[i].timeout) ~= swagger_struct.timeout then
-              reason = reason .. string.format("\n\t  #%i arg of method '%s' must be a table with 'timeout' of type int and not %s",i,fname,type(params[i].timeout))
+            params[i].term = tonumber(params[i].term)
+            if math.type(params[i].term) ~= swagger_struct.term then
+              reason = reason .. string.format("\n\t  #%i arg of method '%s' must be a table with 'term' of type int and not %s",i,fname,type(params[i].term))
             end
           end
 
@@ -125,4 +125,4 @@ function VALIDATOR.validate_client(params,fname,iface_args)
   return valid, params, reasons
 end
 
-return VALIDATOR 
+return VALIDATOR
