@@ -19,8 +19,8 @@ function Queue.pop(queue)
   return value
 end
 
-function Queue.isEmpty(queue)
-  return queue.first > queue.last
+function Queue.isNotEmpty(queue)
+  return not (queue.first > queue.last)
 end
 
 return Queue

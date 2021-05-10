@@ -1,3 +1,8 @@
+--
+-- LuaRaft
+-- Author: Thiago Sousa Bastos
+--
+
 package.path = "../rpc/?.lua;" .. package.path
 local luarpc = require("luarpc")
 
@@ -7,6 +12,7 @@ local json = require("json")
 local Queue = require("queue")
 local states = require("states")
 local timeouts = require("timeouts")
+local messageTypes = require("message_types")
 
 local luaraft = {}
 
@@ -29,75 +35,117 @@ local function dumpTable(o)
    end
 end
 
-----------------------------------------------------------
-local function processReceivedMessages()
-  --while #messageQueue > 0 do
-  --  -- pop message from queue
-  --  local message = 0
+-------------------------------------------------------------------------------
+-- Message functions
+-------------------------------------------------------------------------------
+local function processReceivedMessages(node)
+  print("LuaRaft: Processing Received Messages")
 
-  --  if message ~= nil then
-  --    message[message.type]()
-  --  end
+  while Queue.isNotEmpty(node.receivedMessages) do
+    local message = Queue.pop(node.receivedMessages)
 
-  --end
+    if message.type ~= nil then
+      messageTypes[message.type]()
+    end
+  end
 end
 
 local function processSentMessages()
 
 end
 
---[[
-  message = {
-    term = 1
-    fromNode = 2
-    toNode = 3
-    type = "RequestVote"
-    value = nil
-  }
-]]--
+local function sendMessage(message, proxy)
+  print("LuaRaft: Sending Message")
+  -- Build message
+  --local message = {
+  --  term = messageParams.term,
+  --  fromNode = messageParams.fromNode,
+  --  toNode = messageParams.toNode,
+  --  type = messageParams.type,
+  --  value = messageParams.val
+  --}
 
------------------------- RPC-API ------------------------
-function luaraft.ReceiveMessage(messageStruct)
-  print("Receiving message")
-
-  if messageStruct.type ~= nil then
-    Queue.push(node.receivedMessages, messageStruct)
-    return "Message received"
+  local success = proxy.ReceiveMessage(message)
+  if success then
+    print("Success sending")
+    return true
+  else
+    print("Message not accepted from " .. message.fromNode .. " to " .. message.toNode)
+    return false
   end
+end
 
-  return "Message not accepted"
+-------------------------------------------------------------------------------
+-- Leader Election
+-------------------------------------------------------------------------------
+local function initElection(node)
+  if node.state == states.Leader then
+    print("Leader")
+  else
+    print("initElection else")
+  end
+end
+
+local function isMajorityQuorum(node)
+  return node.votesReceived >= (((#node.peerPorts) + 1) + 1)/2
+end
+
+-------------------------------------------------------------------------------
+-- RPC-API
+-------------------------------------------------------------------------------
+function luaraft.ReceiveMessage(messageStruct)
+  print("LuaRaft: Receiving message")
+
+  if messageStruct.type then
+    Queue.push(node.receivedMessages, messageStruct)
+    return false
+  end
+  return true
 end
 
 -- Builds a node and starts its lifecycle
 function luaraft.InitializeNode(port, peers)
   peers = json.decode(peers)
 
-  -- Build node struct
-  node.state = states.Follower
-  node.receivedMessages = Queue.new()
-  node.sentMessages = Queue.new()
-  node.isAlive = true
-  node.port = port -- Maybe unused
-  node.peerPorts = peers -- Maybe unused
-  node.peerProxies = {}
+  -- Build node
+  node = {
+    state = states.Follower,
+    receivedMessages = Queue.new(),
+    sentMessages = Queue.new(),
+    isAlive = true,
+    port = port, -- Maybe unused
+    peerPorts = peers, -- Maybe unused
+    peerProxies = {},
+    votedFor = nil,
+    currentTerm = 0
+  }
 
   for index, peer_port in ipairs(peers) do
     table.insert(node.peerProxies, index, luarpc.createProxy(IP, peer_port, idl))
   end
 
-  while node.isAlive do
-    processReceivedMessages()
-    processSentMessages()
-  end
+  print("LuaRaft: Node " .. port .. " initialized")
 
-  print("Node Initialized from LuaRaft")
+  -- Lifecycle
+  while node.isAlive do
+    -- TODO: Como definir o tempo de wait ?
+    luarpc.wait(2)
+    processReceivedMessages(node)
+    processSentMessages()
+
+    if node.state == states.Leader then
+      print("Send heartbeat to peers")
+    end
+
+    --initElection(node)
+  end
 end
 
 -- Kills a node from the cluster
 function luaraft.StopNode()
   node.isAlive = false
   -- lembrar de matar as mensagens que tem que processar
-  print("Node stoped from LuaRaft")
+  print("LuaRaft: Node stoped")
 end
 
 return luaraft

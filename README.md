@@ -9,7 +9,8 @@ This library is the second assigment for the course INF 2545 - Distributed Syste
 ## Dependencies
 * Lua 5.4.2
 * [LuaSocket 3.0](https://luarocks.org/modules/luasocket/luasocket)
+* [json.lua](https://github.com/rxi/json.lua/)
 
 ## References:
-https://raft.github.io/raft.pdf
-https://thesquareplanet.com/blog/students-guide-to-raft/
+* https://raft.github.io/raft.pdf
+* https://thesquareplanet.com/blog/students-guide-to-raft/
