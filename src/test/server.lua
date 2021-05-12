@@ -4,7 +4,7 @@ local luarpc = require("luarpc")
 package.path = "../raft/?.lua;" .. package.path
 local luaraft = require("luaraft")
 
-local port = "8000"
+local port = arg[1]
 local idl = "../interface.lua"
 
 local myobj = {

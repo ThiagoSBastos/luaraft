@@ -5,9 +5,9 @@ package.path = "../json.lua/?.lua;" .. package.path
 local json = require("json")
 
 local IP = "127.0.0.1"
-local port = "8001"
 local idl = "../interface.lua"
 
+local port = arg[1]
 local myport = tonumber(arg[1])
 local peers = {}
 
@@ -16,5 +16,5 @@ for i = 2, #arg, 1 do
 end
 peers = json.encode(peers)
 
-local p2 = luarpc.createProxy(IP, port, idl)
-p2.InitializeNode(myport, peers)
+local p1 = luarpc.createProxy(IP, port, idl)
+p1.InitializeNode(myport, peers)
