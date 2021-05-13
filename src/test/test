@@ -4,20 +4,20 @@ cd ${0%/*} || exit 1 # Run from this directory
 server_cmd="lua server.lua"
 client_cmd="lua client.lua"
 
-server_process_array=("server1" "server2" "server3")
-client_process_array=("client1" "client2" "client3")
+server_process_array=("server1" "server2")
+client_process_array=("client1" "client2")
 
 # Array containing the port of the server
-server_ports_array=("8000" "8001" "8002")
+server_ports_array=("8000" "8001")
 
 # Array containing the ports of the server and its peers
-client_ports_array=("8000 8001 8002" "8001 8000 8002" "8002 8000 8001")
+client_ports_array=("8000 8001" "8001 8000")
 
-nbashes=${#server_process_array[@]}
+nbashes=${#client_process_array[@]}
 i=0
 while [ $i -lt $nbashes ];
 do
-  tmux new -d -s ${server_process_array[$i]} \;
-  tmux send-keys -t ${server_process_array[$i]} "${server_cmd} " "${server_ports_array[$i]}" C-m &
+  tmux new -d -s ${client_process_array[$i]} \;
+  tmux send-keys -t ${client_process_array[$i]} "${client_cmd} " "${client_ports_array[$i]}" C-m &
   let "i++"
 done

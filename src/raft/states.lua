@@ -1,4 +1,3 @@
-
 local states = {
   Leader    = 1,
   Follower  = 2,

@@ -19,7 +19,7 @@ function Queue.pop(queue)
   return value
 end
 
-function Queue.isNotEmpty(queue)
+function Queue.hasItems(queue)
   return not (queue.first > queue.last)
 end
 

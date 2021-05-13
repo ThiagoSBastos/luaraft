@@ -4,10 +4,10 @@ math.random(); math.random(); math.random() -- warming up
 
 local timeouts = {}
 
-local electionTimeoutMin  = 7
-local electionTimeoutMax  = 10
-local heartbeatTimeoutMin = 3
-local heartbeatTimeoutMax = 5
+local electionTimeoutMin  = 8.0
+local electionTimeoutMax  = 11.0
+local heartbeatTimeoutMin = 3.0
+local heartbeatTimeoutMax = 6.0
 
 local timeoutsList = {
   Election = function ()
@@ -18,7 +18,7 @@ local timeoutsList = {
   end
 }
 
-function timeouts.getTimeout(type)
+function timeouts.GetTimeout(type)
   return timeoutsList[type]()
 end
 
