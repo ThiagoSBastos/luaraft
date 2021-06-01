@@ -4,14 +4,14 @@ cd ${0%/*} || exit 1 # Run from this directory
 server_cmd="lua server.lua"
 client_cmd="lua client.lua"
 
-server_process_array=("server1" "server2")
-client_process_array=("client1" "client2")
+server_process_array=("server1" "server2" "server3")
+client_process_array=("client1" "client2" "client3")
 
 # Array containing the port of the server
-server_ports_array=("8000" "8001")
+server_ports_array=("5000" "5001" "5002")
 
 # Array containing the ports of the server and its peers
-client_ports_array=("8000 8001" "8001 8000")
+client_ports_array=("5000 5001 5002" "5001 5000 5002" "5002 5000 5001")
 
 nbashes=${#client_process_array[@]}
 i=0

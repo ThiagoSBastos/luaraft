@@ -21,7 +21,7 @@ interface = {
     InitializeNode = {
       resulttype = "void",
       args = {
-        {direction = "in", type = "int"},
+        {direction = "in", type = "string"},
         {direction = "in", type = "string"}
       }
     },
